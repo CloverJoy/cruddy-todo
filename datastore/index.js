@@ -24,10 +24,33 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  // var data = _.map(items, (text, id) => {
+  //   return { id, text };
+  // });
+  // callback(null, data);
+  var filePath = exports.dataDir;
+  fs.readdir(filePath, (err, files) => {
+    if (err) {
+      throw (err);
+    } else {
+      // callback(null, files);
+      var copyFiles = files.map((value) => {
+        var id = value.replace('.txt', '');
+        var objectResult = {};
+        objectResult.id = id;
+        var eachText = fs.readFileSync(path.join(filePath, value));
+        //this is illegal because I use readFileSync lol
+        objectResult.text = eachText.toString();
+        console.log(objectResult);
+        return objectResult;
+      });
+      callback(null, copyFiles);
+    }
   });
-  callback(null, data);
+
+  // refactor existing test...
+  // ... to expect text of to-do instead of id
+  // many async functions needed?
 };
 
 exports.readOne = (id, callback) => {

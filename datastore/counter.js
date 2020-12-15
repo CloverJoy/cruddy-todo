@@ -41,10 +41,23 @@ const writeCounter = (count, callback) => {
 exports.getNextUniqueId = (callback) => {
   // counter = counter + 1;
   // return zeroPaddedNumber(counter);
-  readCounter((err, counter) => {
-    writeCounter(counter + 1, (err, uniqueId) => {
-      callback(err, uniqueId);
-    });
+  // readCounter((err, counter) => {
+  //   writeCounter(counter + 1, (err, uniqueId) => {
+  //     callback(err, uniqueId);
+  //   });
+  // });
+  readCounter(function (err, counter) {
+    if (err) {
+      throw (err);
+    } else {
+      writeCounter(counter + 1, function (err, uniqueId) {
+        if (err) {
+          throw (err);
+        } else {
+          callback(err, uniqueId);
+        }
+      });
+    }
   });
 };
 
