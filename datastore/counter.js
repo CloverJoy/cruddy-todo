@@ -38,13 +38,27 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = () => {
-  counter = counter + 1;
-  return zeroPaddedNumber(counter);
+exports.getNextUniqueId = (callback) => {
+  // counter = counter + 1;
+  // return zeroPaddedNumber(counter);
+  readCounter((err, counter) => {
+    writeCounter(counter + 1, (err, uniqueId) => {
+      callback(err, uniqueId);
+    });
+  });
 };
 
+// readCounter first, to extract the file data from latest entry??
+// after we read and have file data, we want to create the next unique id...
+// ...and then writeCounter
 
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
 
 exports.counterFile = path.join(__dirname, 'counter.txt');
+
+
+// to get next unique id, we need the last id plus 1
+// we need the counter variable to be saved to the hard drive
+// do we need to create a new file? a new dir?
+// how can we re-write getNextUniqueId to utilize the helper functions?
