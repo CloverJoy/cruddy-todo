@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
+const Promise = require('bluebird');
+const readFilePromise = Promise.promisify(fs.readFile);
 
 var items = {};
 
@@ -34,17 +36,21 @@ exports.readAll = (callback) => {
       throw (err);
     } else {
       // callback(null, files);
-      var copyFiles = files.map((value) => {
-        var id = value.replace('.txt', '');
-        var objectResult = {};
-        objectResult.id = id;
-        var eachText = fs.readFileSync(path.join(filePath, value));
+      var copyFiles = files.map((file) => {
+        var id = file.replace('.txt', '');
+        // var eachText = fs.readFileSync(path.join(filePath, value));
         //this is illegal because I use readFileSync lol
-        objectResult.text = eachText.toString();
-        console.log(objectResult);
-        return objectResult;
+        var eachFilePath = path.join(filePath, file);
+        return readFilePromise(eachFilePath).then(fileData => {
+          return {
+            id: id,
+            text: fileData.toString()
+          };
+        });
       });
-      callback(null, copyFiles);
+      Promise.all(copyFiles)
+        .then(result => callback(null, result), err => callback(err));
+      // callback(null, copyFiles);
     }
   });
 
